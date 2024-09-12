@@ -9,10 +9,10 @@ namespace DataAccessLayer
 {
   public  interface ICourseDetailsRepository
     {
-        public List<CourseDetails> SelectALLStudent();
-        public CourseDetails SelectUserByName(string username);
-        public void RegisterUser(CourseDetails reg);
-        public void UpdateUser(CourseDetails reg);
-        public void DeleteUser(long regId);
+        public void InsertUser(CourseDetails loc);
+        public CourseDetails GetUserByName(string name);
+        public List<CourseDetails> GetAllUsers();
+        public void UpdateUser(CourseDetails loc);
+        public void DeleteUser(long id);
     }
 }

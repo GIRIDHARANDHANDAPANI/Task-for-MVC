@@ -20,14 +20,15 @@ namespace Task_for_MVC.Controllers
         // GET: CourseDetailsController
         public ActionResult List()
         {
-            var result = course.SelectALLStudent();
+            var result = course.GetAllUsers();
             return View("List",result);
         }
 
         // GET: CourseDetailsController/Details/5
-        public ActionResult Details(int id)
+        public ActionResult Details(string username)
         {
-            return View();
+            var edit = course.GetUserByName(username);
+            return View("Details",edit);
         }
 
         // GET: CourseDetailsController/Create
@@ -43,8 +44,22 @@ namespace Task_for_MVC.Controllers
         {
             try
             {
-                course.RegisterUser(cour);
-                return RedirectToAction(nameof(List));
+                if (ModelState.IsValid)
+                {
+                    var result = course.GetUserByName(cour.Name);
+                    if (result != null)
+                    {
+                        ModelState.AddModelError("", "User Name Already Exists");
+                        return View("Add", cour);
+                    }
+                    course.InsertUser(cour);
+                    return RedirectToAction(nameof(List));
+                }
+                else
+                {
+                    return View("Add", cour);
+                }
+                
             }
             catch
             {
@@ -55,7 +70,7 @@ namespace Task_for_MVC.Controllers
         // GET: CourseDetailsController/Edit/5
         public ActionResult Edit(string username)
         {
-            var edit = course.SelectUserByName(username);
+            var edit = course.GetUserByName(username);
             return View("update",edit);
         }
 
@@ -66,8 +81,22 @@ namespace Task_for_MVC.Controllers
         {
             try
             {
-                course.UpdateUser(cours);
-                return RedirectToAction(nameof(List));
+                if (ModelState.IsValid)
+                {
+                    var result = course.GetUserByName(cours.Name);
+                    if (result != null)
+                    {
+                        ModelState.AddModelError("", "User Name Already Exists");
+                        return View("update", cours);
+                    }
+                    course.UpdateUser(cours);
+                    return RedirectToAction(nameof(List));
+                }
+                else
+                {
+                    return View("update", cours);
+                }
+                
             }
             catch
             {
@@ -76,19 +105,21 @@ namespace Task_for_MVC.Controllers
         }
 
         // GET: CourseDetailsController/Delete/5
-        public ActionResult Delete(int id)
+        public ActionResult Delete(string username)
         {
-            return View();
+            var details = course.GetUserByName(username);
+            return View("ConfirmDelete",details);
         }
 
         // POST: CourseDetailsController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public ActionResult Delete(long id, IFormCollection collection)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                course.DeleteUser(id);
+                return RedirectToAction(nameof(List));
             }
             catch
             {

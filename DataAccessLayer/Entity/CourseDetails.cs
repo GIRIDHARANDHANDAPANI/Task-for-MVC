@@ -12,6 +12,7 @@ namespace DataAccessLayer.Entity
         public long CourseDetailsID { get; set; }
         [Required]
         [MaxLength(15)]
+        
         public string Name { get; set; }
         [Required]
         public string InstitutionName { get; set; }

@@ -10,96 +10,67 @@ using System.Data.SqlClient;
 
 namespace DataAccessLayer
 {
-  public  class CourseDetailsRepository:ICourseDetailsRepository
+    public class CourseDetailsRepository : ICourseDetailsRepository
     {
-        string connectionString = string.Empty; //"server=DESKTOP-UCPA9BN;database=Course;user Id =sa;password=Anaiyaan@123;";
-        SqlConnection con = null;
-        public CourseDetailsRepository(IConfiguration configuration)
+        CourseDetailsDbcontext Dbcontext = null;
+        public CourseDetailsRepository(CourseDetailsDbcontext context)
         {
-            connectionString = configuration.GetConnectionString("DbConnection");
-            con = new SqlConnection(connectionString);
+            Dbcontext = context;
         }
-
-        public List<CourseDetails> SelectALLStudent()
+        public void InsertUser(CourseDetails loc)
         {
             try
             {
-                var selectQuery = $"exec SelectAllStudents";
-                con.Open();
-                List<CourseDetails> result = con.Query<CourseDetails>(selectQuery).ToList();
-                con.Close();
+                Dbcontext.Add(loc);
+                Dbcontext.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
 
-                return result;
-
+        }
+        public CourseDetails GetUserByName(string name)
+        {
+            try
+            {
+                return Dbcontext.coursedetails.FirstOrDefault(X => X.Name == name);
             }
             catch (Exception ex)
             {
                 throw;
             }
         }
-
-        public CourseDetails SelectUserByName(string username)
+        public List<CourseDetails> GetAllUsers()
         {
             try
             {
-                var selectQuery = $"exec SelectByName '{username}'";
-                con.Open();
-                CourseDetails result = con.QueryFirstOrDefault<CourseDetails>(selectQuery);
-                con.Close();
-
-                return result;
-
+                return Dbcontext.coursedetails.ToList();
             }
             catch (Exception ex)
             {
                 throw;
             }
         }
-
-        public void RegisterUser(CourseDetails reg)
+        public void UpdateUser(CourseDetails loc)
         {
             try
             {
-                var insertQuery = $"exec InsertUser '{reg.Name}','{reg.InstitutionName}',{reg.EnquiryNumber},'{reg.Startdate.ToString("yyyy-MM-dd")}','{reg.Enddate.ToString("yyyy-MM-dd")}',{reg.Fees}";
-                con.Open();
-                con.Execute(insertQuery);
-                con.Close();
-
+                Dbcontext.Update(loc);
+                Dbcontext.SaveChanges();
             }
             catch (Exception ex)
             {
                 throw;
             }
         }
-
-        public void UpdateUser(CourseDetails reg)
+        public void DeleteUser(long id)
         {
             try
             {
-                var updateQuery = $"exec UpdateUser {reg.CourseDetailsID},'{reg.Name}','{reg.InstitutionName}',{reg.EnquiryNumber},'{reg.Startdate}','{reg.Enddate}',{reg.Fees}";
-                //var connectionString = "server=DESKTOP-8VD1A1F\\SQLEXPRESS;database=batch9;user Id =sa;password=Anaiyaan@123;";
-
-                con.Open();
-                con.Execute(updateQuery);
-                con.Close();
-
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
-        }
-
-
-        public void DeleteUser(long regId)
-        {
-            try
-            {
-                var updateQuery = $"exec DeleteUser {regId}";
-                con.Open();
-                con.Execute(updateQuery);
-                con.Close();
-
+                var count = Dbcontext.coursedetails.Find(id);
+                Dbcontext.Remove(count);
+                Dbcontext.SaveChanges();
             }
             catch (Exception ex)
             {
